@@ -1,0 +1,108 @@
+<?php
+
+/**
+ * Implements hook_menu().
+ */
+function menu_magic_menu()
+{
+  $item = [];
+  $item['magic'] = [
+    'title' => 'A little magic',
+    'page callback' => 'menu_magic_basic',
+    'access arguments' => ['access content'],
+  ];
+
+  $item['magic/%'] = [
+    'title' => 'Awesome ! Get argument name',
+    'page callback' => 'menu_magic_extra',
+    'access arguments' => ['access content'],
+    'page arguments' => [1],
+    'file' => 'menu_magic.extra.inc'
+  ];
+
+  $item['user/%/magic'] = [
+    'title' => 'User details',
+    'description' => 'Display user details',
+    'page callback' => 'menu_magic_user',
+    'access arguments' => ['administer users'],
+    'page arguments' => [1],
+    'file' => 'menu_magic.user.inc',
+    'type' => MENU_LOCAL_TASK
+  ];
+
+  $item['node/%node/magic'] = [
+    'title' => 'Magic',
+    'description' => 'Custom Node details',
+    'page callback' => 'menu_magic_node_user',
+    'access arguments' => ['access context'],
+    'page arguments' => [1],
+    'file' => 'menu_magic.context.inc',
+    'type' => MENU_LOCAL_TASK,
+    'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE
+  ];
+
+
+  return $item;
+}
+
+function menu_magic_basic() {
+  $content = [];
+
+  $content['raw_markup'] = [
+    '#type' => 'markup',
+    '#markup' => 'This is demo menu!',
+    'prefix' => '<p>',
+    'suffix' => '</p>'
+  ];
+
+  $variables = [
+    'path' => 'https://placekitten.com/g/400/450',
+    'alt' => t('Image alt text'),
+    'title' => t('This is a title')
+  ];
+
+  $content['themed_data'] = [
+    '#type' => 'markup',
+    '#markup' => theme('image', $variables),
+    '#prefix' => '<div class="menu_magic_image">',
+    '#suffix' => '</div>',
+    '#attached' => [
+      'css' => [
+        drupal_get_path('module','menu_magic').'/menu_magic.css'
+      ]
+    ]
+  ];
+
+  $content['renderable_element'] = [
+    '#theme' => 'item_list',
+    '#title' => 'Some List Items',
+    '#items' => [
+      t('PHP'),
+      t('JAVASCRIPT'),
+      t('HTML'),
+      t('The current time is %time',['%time' => date('r')])
+    ],
+    '#cache' => [
+      'keys' => ['menu_magic','renderable_element'],
+      'bin' => 'cache',
+      'expire' => time() + 30,
+      'granularity' => DRUPAL_CACHE_PER_PAGE
+    ]
+  ];
+
+  return $content;
+}
+
+/**
+ * Implements hook_permission()
+ * @return array
+ */
+function menu_magic_permission() {
+  return array(
+    'administer menu module' => array(
+      'title' => t('Administer menu magic module'),
+      'description' => t('Perform administration tasks for magic menu module.'),
+    ),
+  );
+}
+

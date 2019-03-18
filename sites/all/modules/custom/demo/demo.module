@@ -1,0 +1,32 @@
+<?php
+/**
+ * Implements hook_node_view().
+ */
+function demo_node_view($node, $view_mode, $langcode)
+{
+  $node->content['demo_field'] = [
+    '#type' => 'markup',
+    '#markup' => '<p>'.t('This is demo paragraph tag').'</p>',
+    '#weight' => -10
+  ];
+
+  $node->content['demo_list'] = [
+    '#items' => ['red', 'blue', 'green'],
+    '#theme' => 'item_list',
+    '#weight' => -9
+  ];
+  //krumo($node);
+}
+
+/**
+ * Implements hook_permission()
+ * @return array
+ */
+function demo_permission() {
+  return array(
+    'administer my module' => array(
+      'title' => t('Administer my module'),
+      'description' => t('Perform administration tasks for my module.'),
+    ),
+  );
+}
